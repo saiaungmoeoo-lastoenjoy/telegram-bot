@@ -34,5 +34,9 @@ telegramBot.onText(/\/3d/, async (msg) => {
 telegramBot.onText(/\/news_(\w+)/, async (msg, match) => {
   const search = match[1];
   const news = await getNews(search);
-  news.articles.map((a) => telegramBot.sendMessage(msg.chat.id, `${a.title} \n${a.description} \n${a.url}`));
+  if (news.articles.length) {
+    news.articles.map((a) => telegramBot.sendMessage(msg.chat.id, `${a.title} \n${a.description} \n${a.url}`));
+  } else {
+    telegramBot.sendMessage(msg.chat.id, `There is no news about ${search}.`);
+  }
 });
