@@ -8,7 +8,7 @@ const TELEGRAM_BOT_API_KEY = process.env.TELEGRAM_BOT_API_KEY;
 const telegramBot = new TelegramBot(TELEGRAM_BOT_API_KEY, { polling: true });
 
 telegramBot.onText(/\/start/, (msg) => {
-  telegramBot.sendMessage(msg.chat.id, `Welcome ${msg.chat.first_name}.\nText /joke to read jokes.\nText /quote to read zen quotes.`);
+  telegramBot.sendMessage(msg.chat.id, `Welcome ${msg.chat.first_name}.`);
 });
 
 telegramBot.onText(/\/joke/, async (msg) => {
