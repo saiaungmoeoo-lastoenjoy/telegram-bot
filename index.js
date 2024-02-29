@@ -3,7 +3,7 @@ const app = express();
 import http from "http";
 import dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
-import { get2d, get3d, getJoke, getNews, getQuote } from "./api.js";
+import { get2d, get3d, getCoinPrice, getJoke, getNews, getPassword, getQuote } from "./api.js";
 dotenv.config();
 
 const TELEGRAM_BOT_API_KEY = process.env.TELEGRAM_BOT_API_KEY;
@@ -36,6 +36,23 @@ telegramBot.onText(/\/2d/, async (msg) => {
 telegramBot.onText(/\/3d/, async (msg) => {
   const num = await get3d();
   telegramBot.sendMessage(msg.chat.id, `${num}`);
+});
+
+telegramBot.onText(/\/password_(\w+)/, async (msg, match) => {
+  const num = match[1];
+  const password = await getPassword(num);
+  telegramBot.sendMessage(msg.chat.id, `${password}`);
+});
+
+telegramBot.onText(/\/coinprice_(\w+)/, async (msg, match) => {
+  const name = match[1];
+  const coin = await getCoinPrice(name);
+  console.log(coin);
+  if (coin) {
+    telegramBot.sendMessage(msg.chat.id, `Name: ${coin.Name} \nPrice: ${coin.Price}`);
+  } else {
+    telegramBot.sendMessage(msg.chat.id, `There is no prices about ${name}.`);
+  }
 });
 
 telegramBot.onText(/\/news_(\w+)/, async (msg, match) => {
