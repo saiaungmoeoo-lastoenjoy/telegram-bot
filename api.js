@@ -1,10 +1,12 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
 dotenv.config();
 
 export const getJoke = async () => {
   try {
-    const response = await axios.get("https://v2.jokeapi.dev/joke/Any?type=twopart");
+    const response = await axios.get("https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist&type=twopart");
     return response.data;
   } catch (error) {
     console.log(error);
@@ -82,5 +84,22 @@ export const getNews = async (search) => {
   } catch (error) {
     console.log(error);
     return "No More News";
+  }
+};
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+
+export const getMessages = async (prompt) => {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    const result = await model.generateContent(prompt);
+
+    const text = result.response.text();
+
+    return text;
+  } catch (err) {
+    console.log(err);
+    return "Sorry, we could not answer due to safety reasons.";
   }
 };

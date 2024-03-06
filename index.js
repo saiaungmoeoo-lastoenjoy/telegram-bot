@@ -3,7 +3,7 @@ const app = express();
 import http from "http";
 import dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
-import { get2d, get3d, getCoinPrice, getJoke, getNews, getPassword, getQuote } from "./api.js";
+import { get2d, get3d, getCoinPrice, getJoke, getMessages, getNews, getPassword, getQuote } from "./api.js";
 dotenv.config();
 
 const TELEGRAM_BOT_API_KEY = process.env.TELEGRAM_BOT_API_KEY;
@@ -15,7 +15,7 @@ const server = http.createServer(app);
 const telegramBot = new TelegramBot(TELEGRAM_BOT_API_KEY, { polling: true });
 
 telegramBot.onText(/\/start/, (msg) => {
-  telegramBot.sendMessage(msg.chat.id, `Welcome ${msg.chat.first_name}.`);
+  telegramBot.sendMessage(msg.chat.id, `Welcome ${msg.chat.first_name} ${msg.chat.last_name}.\nJust ask anything you want.`);
 });
 
 telegramBot.onText(/\/joke/, async (msg) => {
@@ -47,7 +47,6 @@ telegramBot.onText(/\/password_(\w+)/, async (msg, match) => {
 telegramBot.onText(/\/coinprice_(\w+)/, async (msg, match) => {
   const name = match[1];
   const coin = await getCoinPrice(name);
-  console.log(coin);
   if (coin) {
     telegramBot.sendMessage(msg.chat.id, `Name: ${coin.Name} \nPrice: ${coin.Price}`);
   } else {
@@ -63,6 +62,19 @@ telegramBot.onText(/\/news_(\w+)/, async (msg, match) => {
   } else {
     telegramBot.sendMessage(msg.chat.id, `There is no news about ${search}.`);
   }
+});
+
+telegramBot.on("message", async (msg) => {
+  if (msg.text[0] !== "/") {
+    const messages = await getMessages(msg.text);
+    telegramBot.sendMessage(msg.chat.id, `${messages}`);
+  }
+  return;
+});
+
+telegramBot.onText(/\/loc/, async (msg) => {
+  console.log(msg);
+  telegramBot.sendLocation(msg.chat.id, `location`);
 });
 
 server.listen(PORT, () => {
