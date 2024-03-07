@@ -1,6 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createClient } from "pexels";
 
 dotenv.config();
 
@@ -100,6 +101,31 @@ export const getMessages = async (prompt) => {
     return text;
   } catch (err) {
     console.log(err);
-    return "Sorry, we could not answer due to safety reasons.";
+    return "Sorry, we can not answer due to safety reasons.";
+  }
+};
+
+export const getImages = async (search) => {
+  try {
+    let images = [];
+    const client = createClient(process.env.PEXELS_API_KEY);
+
+    const res = await client.photos.search({ query: search, orientation: "landscape", per_page: 4 });
+
+    res.photos.map((photo) => images.push(photo.src.medium));
+    return images;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};
+
+export const getWeather = async (city) => {
+  try {
+    const response = await axios.get(`http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API_KEY}&q=${city}&aqi=no`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return null;
   }
 };

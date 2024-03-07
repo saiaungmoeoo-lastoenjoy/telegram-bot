@@ -3,7 +3,7 @@ const app = express();
 import http from "http";
 import dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
-import { get2d, get3d, getCoinPrice, getJoke, getMessages, getNews, getPassword, getQuote } from "./api.js";
+import { get2d, get3d, getCoinPrice, getImages, getJoke, getMessages, getNews, getPassword, getQuote, getWeather } from "./api.js";
 dotenv.config();
 
 const TELEGRAM_BOT_API_KEY = process.env.TELEGRAM_BOT_API_KEY;
@@ -65,16 +65,39 @@ telegramBot.onText(/\/news_(\w+)/, async (msg, match) => {
 });
 
 telegramBot.on("message", async (msg) => {
-  if (msg.text[0] !== "/") {
+  if (msg.text && msg.text[0] !== "/") {
     const messages = await getMessages(msg.text);
     telegramBot.sendMessage(msg.chat.id, `${messages}`);
   }
   return;
 });
 
-telegramBot.onText(/\/loc/, async (msg) => {
-  console.log(msg);
-  telegramBot.sendLocation(msg.chat.id, `location`);
+telegramBot.onText(/\/quoteimage/, async (msg) => {
+  telegramBot.sendPhoto(msg.chat.id, "https://zenquotes.io/api/image");
+});
+
+telegramBot.onText(/\/images_(\w+)/, async (msg, match) => {
+  const search = match[1];
+  const photos = await getImages(search);
+
+  if (photos.length) {
+    photos.map((a) => telegramBot.sendPhoto(msg.chat.id, a));
+  } else {
+    telegramBot.sendMessage(msg.chat.id, `There is no photo about ${search}.`);
+  }
+});
+
+telegramBot.onText(/\/weather_(\w+)/, async (msg, match) => {
+  const search = match[1];
+  const data = await getWeather(search);
+
+  console.log(data);
+
+  if (data) {
+    telegramBot.sendMessage(msg.chat.id, `${data.location.name} - ${data.location.country} \nTemperature : ${data.current.temp_c}*C \nWind : ${data.current.wind_mph}mph \nCloud : ${data.current.cloud}% \nHumidity : ${data.current.humidity} `);
+  } else {
+    telegramBot.sendMessage(msg.chat.id, `There is no info about ${search}.`);
+  }
 });
 
 server.listen(PORT, () => {
