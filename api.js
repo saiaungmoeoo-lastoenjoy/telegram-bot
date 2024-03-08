@@ -129,3 +129,14 @@ export const getWeather = async (city) => {
     return null;
   }
 };
+
+export const getMovie = async (title) => {
+  try {
+    const response = await axios.get(`https://api.themoviedb.org/3/search/movie?query=${title}&include_adult=false&language=en-US&page=1&api_key=${process.env.MOVIE_API_KEY}`);
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};

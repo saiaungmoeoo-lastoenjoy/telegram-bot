@@ -3,7 +3,7 @@ const app = express();
 import http from "http";
 import dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
-import { get2d, get3d, getCoinPrice, getImages, getJoke, getMessages, getNews, getPassword, getQuote, getWeather } from "./api.js";
+import { get2d, get3d, getCoinPrice, getImages, getJoke, getMessages, getMovie, getNews, getPassword, getQuote, getWeather } from "./api.js";
 dotenv.config();
 
 const TELEGRAM_BOT_API_KEY = process.env.TELEGRAM_BOT_API_KEY;
@@ -93,6 +93,21 @@ telegramBot.onText(/\/weather_(\w+)/, async (msg, match) => {
 
   if (data) {
     telegramBot.sendMessage(msg.chat.id, `${data.location.name} - ${data.location.country} \nTemperature : ${data.current.temp_c}*C \nWind : ${data.current.wind_mph}mph \nCloud : ${data.current.cloud}% \nHumidity : ${data.current.humidity} `);
+  } else {
+    telegramBot.sendMessage(msg.chat.id, `There is no info about ${search}.`);
+  }
+});
+
+telegramBot.onText(/\/movie_(\w+)/, async (msg, match) => {
+  const search = match[1];
+
+  const data = await getMovie(search);
+  if (data.results) {
+    data.results.map((movie) => {
+      if (movie.poster_path) {
+        telegramBot.sendMessage(msg.chat.id, `Title : ${movie.original_title} \nOverview : ${movie.overview} \nUrl : https://www.themoviedb.org/movie/${movie.id}`);
+      }
+    });
   } else {
     telegramBot.sendMessage(msg.chat.id, `There is no info about ${search}.`);
   }
