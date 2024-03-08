@@ -91,8 +91,6 @@ telegramBot.onText(/\/weather_(\w+)/, async (msg, match) => {
   const search = match[1];
   const data = await getWeather(search);
 
-  console.log(data);
-
   if (data) {
     telegramBot.sendMessage(msg.chat.id, `${data.location.name} - ${data.location.country} \nTemperature : ${data.current.temp_c}*C \nWind : ${data.current.wind_mph}mph \nCloud : ${data.current.cloud}% \nHumidity : ${data.current.humidity} `);
   } else {
